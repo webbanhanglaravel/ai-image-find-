@@ -8,9 +8,18 @@ interface CameraCaptureProps {
 const CameraCapture: React.FC<CameraCaptureProps> = ({ onImageCaptured }) => {
   const { videoRef, isActive, startCamera, stopCamera, captureImage } =
     useCamera();
+  const [error, setError] = React.useState<string | null>(null);
 
-  const handleStartCamera = () => {
-    startCamera();
+  const handleStartCamera = async () => {
+    try {
+      setError(null);
+      await startCamera();
+    } catch (err) {
+      setError(
+        "Không thể mở camera. Vui lòng kiểm tra quyền truy cập camera hoặc thử trên thiết bị khác."
+      );
+      console.error("Camera error:", err);
+    }
   };
 
   const handleCapture = () => {
@@ -23,6 +32,11 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onImageCaptured }) => {
 
   return (
     <div className="mt-4 flex flex-col items-center">
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
       {!isActive ? (
         <button className="btn" onClick={handleStartCamera}>
           Sử dụng camera
